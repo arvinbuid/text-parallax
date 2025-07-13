@@ -6,16 +6,26 @@ import pic3 from '../../public/images/3.jpg';
 import Lenis from 'lenis';
 import Image, { StaticImageData } from 'next/image';
 
-import { useEffect } from 'react';
+import {useEffect, useRef} from 'react';
+import {motion, MotionValue, useScroll, useTransform} from "framer-motion";
 
 export default function Home() {
-  useEffect(() => {
-    const lenis = new Lenis();
+    const container = useRef<HTMLDivElement | null>(null);
 
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
+    // track scroll progress
+    const { scrollYProgress } = useScroll({
+        target: container,
+        offset: ['start end', 'end start']
+    })
+
+    // initialize lenis smooth scroll
+    useEffect(() => {
+        const lenis = new Lenis();
+
+        function raf(time: number) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
 
     requestAnimationFrame(raf);
   }, [])
@@ -23,9 +33,11 @@ export default function Home() {
   return (
     <main className='overflow-hidden'>
       <div className="h-[100vh]" />
-      <Slide src={pic1} left={"-40%"} />
-      <Slide src={pic2} left={"-25%"} />
-      <Slide src={pic3} left={"-75%"} />
+        <div ref={container}>
+          <Slide src={pic1} direction={"left"} left={"-40%"} progress={scrollYProgress}/>
+          <Slide src={pic2} direction={"right"} left={"-25%"} progress={scrollYProgress} />
+          <Slide src={pic3} direction={"left"} left={"-75%"} progress={scrollYProgress} />
+        </div>
       <div className="h-[100vh]" />
     </main>
   );
@@ -34,15 +46,20 @@ export default function Home() {
 interface SlideProps {
   src: string | StaticImageData;
   left: string;
+  direction: string;
+  progress:  MotionValue<number>;
 }
 
-const Slide = ({ src, left }: SlideProps) => {
+const Slide = ({ src, left, direction, progress }: SlideProps) => {
+  const scrollDirection = direction === 'left' ? -1 : 1;
+  const translateX = useTransform(progress, [0, 1], [150 * scrollDirection, -150 * scrollDirection]);
+
   return (
-    <div style={{ left }} className="relative flex whitespace-nowrap">
+    <motion.div style={{ x: translateX, left }} className="relative flex whitespace-nowrap">
       <Phrase src={src} />
       <Phrase src={src} />
       <Phrase src={src} />
-    </div>
+    </motion.div>
   )
 }
 
