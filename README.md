@@ -1,6 +1,6 @@
 # Text Parallax
 
-A WIP web animation featuring a Text Parallax with sliding text on scroll. Made with Framer Motion and Next.js.
+A web animation text parallax with sliding text on scroll. Made with Framer Motion and Next.js.
 
 <!-- ![Mask Cursor Effect](public/assets/mask-cursor-effect.gif) -->
 
